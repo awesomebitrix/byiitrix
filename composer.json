@@ -1,0 +1,50 @@
+{
+    "name":        "ksaitechnologies/byiitrix",
+    "description": "Show base, i create another spike with yii2 and bitrix in one glass",
+    "keywords":    [
+        "project template",
+        "yii2",
+        "bitrix",
+        "helper",
+        "migration",
+        "spike"
+    ],
+    "homepage":    "https://bitbucket.org/ksaitechnologies/byiitrix",
+    "type":        "project",
+    "license":     "BSD-3-Clause",
+    "authors":     [
+        {
+            "name":  "Vorobyev Andrey",
+            "email": "73.vorobyev@gmail.com",
+            "role":  "Core spike developer"
+        },
+        {
+            "name":  "Nikolsky Kirill",
+            "email": "kirill.nikolsky@gmail.com",
+            "role":  "Core polyfill developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "byiitrix\\": ""
+        }
+    },
+    "require":     {
+        "yiisoft/yii2":             "^2.0.9",
+        "yiisoft/yii2-bootstrap":   "^2.0.6",
+        "yiisoft/yii2-swiftmailer": "^2.0.5",
+        "yiisoft/yii2-jui":         "^2.0.6",
+        "bower-asset/fontawesome":  "^4.6.3",
+        "bower-asset/underscore":   "^1.8.3",
+        "bower-asset/moment":       "^2.14.1"
+    },
+    "require-dev": {
+        "yiisoft/yii2-codeception": "^2.0.5",
+        "yiisoft/yii2-debug":       "^2.0.6",
+        "yiisoft/yii2-gii":         "^2.0.5",
+        "yiisoft/yii2-faker":       "^2.0.3"
+    },
+    "config":      {
+        "process-timeout": 1800
+    }
+}
