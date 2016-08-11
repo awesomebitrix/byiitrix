@@ -1,6 +1,6 @@
 <?php
 
-namespace byiitrix\console;
+namespace common\console;
 
 class Application extends \yii\console\Application
 {

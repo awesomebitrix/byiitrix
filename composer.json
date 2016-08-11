@@ -1,6 +1,6 @@
 {
     "name":        "ksaitechnologies/byiitrix",
-    "description": "Show base, i create another spike with yii2 and bitrix in one glass",
+    "description": "Look base, i create another spike with yii2 and bitrix in one glass",
     "keywords":    [
         "project template",
         "yii2",
@@ -24,11 +24,12 @@
             "role":  "Core polyfill developer"
         }
     ],
-    "autoload": {
+    "autoload":    {
         "psr-4": {
             "byiitrix\\": ""
         }
     },
+    "bin":         ["bin/byiitrix"],
     "require":     {
         "yiisoft/yii2":             "^2.0.9",
         "yiisoft/yii2-bootstrap":   "^2.0.6",
