@@ -10,6 +10,7 @@ $autoload    = $byiitrixDir . '/vendor/autoload.php';
 
 $projectRoot = realpath('.');
 $webRoot     = $projectRoot;
+$withWeb     = false;
 
 /**
  * Check if package installed as dependency and located in vendor directory
@@ -28,6 +29,8 @@ if( class_exists('yii\helpers\Console') === false ) {
     throw new \Exception('Can not resolve yii core classes.');
 }
 
+$withWeb = Console::confirm('Generate web template and configurations?', ['default' => $withWeb]);
+
 if( Console::confirm("Directory \"{$projectRoot}\" is project root?", ['default' => true]) === false ) {
     do {
         $path = Console::prompt('Specify project root path:', ['required' => true]);
@@ -43,7 +46,7 @@ if( Console::confirm("Directory \"{$projectRoot}\" is project root?", ['default'
     $projectRoot = $path;
 }
 
-if( Console::confirm('Project root is web server root?') === false ) {
+if( $withWeb && Console::confirm('Project root is web server root?') === false ) {
     do {
         $path = Console::prompt('Specify web root path:', ['required' => true, 'default' => 'public_html']);
 
@@ -61,20 +64,40 @@ if( Console::confirm('Project root is web server root?') === false ) {
 echo 'Copy template files in project root...' . PHP_EOL;
 
 $commands = [
-    "cp -r {$templateDir}/yii.php {$projectRoot}/yii.php",
-    "cp -r {$templateDir}/yii {$projectRoot}/yii",
-    "cp -r {$templateDir}/common {$projectRoot}/common",
-    "cp -r {$templateDir}/frontend {$projectRoot}/frontend",
-    "cp -r {$templateDir}/console {$projectRoot}/console",
-    "cp -r {$templateDir}/public_html/yii {$webRoot}/yii",
+    "cp -r {$templateDir}/yii.php {$projectRoot}/",
+    "cp -r {$templateDir}/yii {$projectRoot}/",
+    "cp -r {$templateDir}/common {$projectRoot}/",
+    "cp -r {$templateDir}/console {$projectRoot}/",
+    $withWeb ? "cp -r {$templateDir}/frontend {$projectRoot}/" : NULL,
+    $withWeb ? "cp -r {$templateDir}/public_html/app {$webRoot}/" : NULL,
 ];
 
 foreach( $commands as $command ) {
-    echo '    ' . Console::ansiFormat($command, [Console::FG_GREEN]) . PHP_EOL;
-    exec($command);
+    if( $command !== NULL ) {
+        echo '    ' . Console::ansiFormat($command, [Console::FG_GREEN]) . PHP_EOL;
+        exec($command);
+    }
 }
 
-$webIndexContent = <<<TEXT
+$ignores = [
+    '/common/config/*.local.php',
+    '/console/config/*.local.php',
+    $withWeb ? '/frontend/config/*.local.php' : NULL,
+];
+
+echo 'Add local files to gitignore' . PHP_EOL;
+
+$gitIgnore        = $projectRoot . '/.gitignore';
+$gitignoreContent = file_get_contents($gitIgnore);
+
+foreach( $ignores as $ignore ) {
+    if( $ignore !== NULL && preg_match('#' . preg_quote($ignore, '#') . '#', $gitignoreContent) === 0 ) {
+        file_put_contents($gitIgnore, $ignore . PHP_EOL, FILE_APPEND);
+    }
+}
+
+if( $withWeb ) {
+    $webIndexContent = <<<TEXT
 <?php
 
 require \$_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
@@ -94,24 +117,11 @@ require \$_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/epilog_after.
 
 TEXT;
 
-echo 'Create /yii/index.php in web root' . PHP_EOL;
+    echo 'Create /app/index.php in web root' . PHP_EOL;
 
-file_put_contents($webRoot . '/yii/index.php', $webIndexContent);
+    file_put_contents($webRoot . '/app/index.php', $webIndexContent);
 
-$gitignoreContent = <<<TEXT
-
-# byiitrix generated ignore block
-/common/config/*.local.php
-/frontend/config/*.local.php
-/console/config/*.local.php
-
-TEXT;
-
-echo 'Add local files to gitignore' . PHP_EOL;
-
-file_put_contents($projectRoot . '/.gitignore', $gitignoreContent, FILE_APPEND);
-
-$nginxConfig = <<<TEXT
+    $nginxConfig = <<<TEXT
 server {
     listen                          0.0.0.0:80;
     server_name                     localhost;
@@ -130,12 +140,12 @@ server {
         }
     }
 
-    location /yii {
+    location /app {
         try_files                   \$uri \$uri/ @byiitrix;
     }
 
     location @byiitrix {
-        try_files                   /yii/index.php\$is_args\$args =404;
+        try_files                   /app/index.php\$is_args\$args =404;
 
         fastcgi_split_path_info     ^(.+\.php)(/.+)\$;
         fastcgi_pass                127.0.0.1:9000;
@@ -167,15 +177,17 @@ server {
 
     location ~ /\. { deny all; }
 }
+
 TEXT;
 
-echo "Generate nginx vhost configuration stub in {$projectRoot}/nginx.conf" . PHP_EOL;
+    echo "Generate nginx vhost configuration stub in {$projectRoot}/nginx.conf" . PHP_EOL;
 
-file_put_contents($projectRoot . '/nginx.conf', $nginxConfig);
+    file_put_contents($projectRoot . '/nginx.conf', $nginxConfig);
 
-$config  = $projectRoot . '/frontend/config/main.local.php';
-$bytes   = openssl_random_pseudo_bytes(32);
-$key     = strtr(substr(base64_encode($bytes), 0, 32), '+/=', '_-.');
-$content = preg_replace('/(("|\')cookieValidationKey("|\')\s*=>\s*)(""|\'\')/', "\\1'{$key}'", file_get_contents($config));
+    $config  = $projectRoot . '/frontend/config/main.local.php';
+    $bytes   = openssl_random_pseudo_bytes(32);
+    $key     = strtr(substr(base64_encode($bytes), 0, 32), '+/=', '_-.');
+    $content = preg_replace('/(("|\')cookieValidationKey("|\')\s*=>\s*)(""|\'\')/', "\\1'{$key}'", file_get_contents($config));
 
-file_put_contents($config, $content);
+    file_put_contents($config, $content);
+}

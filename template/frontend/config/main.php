@@ -26,10 +26,10 @@ return \yii\helpers\ArrayHelper::merge(require APP_DIR . '/common/config/main.ph
         ],
         'request'      => [
             'class'   => 'common\web\Request',
-            'baseUrl' => '/yii',
+            'baseUrl' => '/app',
         ],
         'view'         => [
-            'class' => 'byiitrix\web\View',
+            'class' => 'common\web\View',
         ],
         'urlManager'   => [
             'enablePrettyUrl' => true,
@@ -37,13 +37,10 @@ return \yii\helpers\ArrayHelper::merge(require APP_DIR . '/common/config/main.ph
             'rules'           => require __DIR__ . '/rules.php',
         ],
         'user'         => [
-            'class'           => 'byiitrix\web\WebUser',
-            'identityClass'   => 'byiitrix\web\User',
+            'class'           => 'common\web\User',
+            'identityClass'   => 'common\models\User',
             'loginUrl'        => ['/auth/login'],
             'enableAutoLogin' => true,
-            'identityCookie'  => [
-                'name' => 'BITRIX_SM_UIDH',
-            ],
         ],
     ],
 ], require __DIR__ . '/main.local.php');

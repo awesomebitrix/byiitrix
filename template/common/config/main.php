@@ -8,9 +8,6 @@ return \yii\helpers\ArrayHelper::merge([
        'cache'        => [
            'class'     => 'yii\caching\FileCache',
        ],
-       'curl'         => [
-           'class' => 'common\base\Curl'
-       ],
        'db'           => require __DIR__ . '/db.php',
        'mailer'       => [
            'class'    => 'yii\swiftmailer\Mailer',
