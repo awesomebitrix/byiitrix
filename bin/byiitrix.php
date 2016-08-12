@@ -1,5 +1,6 @@
 <?php
 /**
+ * Byiitrix installer templates files right in your bitrix project
  */
 
 use yii\helpers\Console;
