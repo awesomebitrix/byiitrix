@@ -6,9 +6,9 @@ namespace common\web;
  * Class WebUser
  * @package common\web
  *
- * @property User $user
+ * @property \common\models\User $user
  *
- * @method User getIdentity($autoRenew = true)
+ * @method \common\models\User getIdentity($autoRenew = true)
  */
 class User extends \yii\web\User
 {

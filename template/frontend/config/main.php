@@ -25,8 +25,7 @@ return \yii\helpers\ArrayHelper::merge(require APP_DIR . '/common/config/main.ph
             'class' => 'common\web\Response',
         ],
         'request'      => [
-            'class'   => 'common\web\Request',
-            'baseUrl' => '/app',
+            'class' => 'common\web\Request',
         ],
         'view'         => [
             'class' => 'common\web\View',
@@ -43,4 +42,5 @@ return \yii\helpers\ArrayHelper::merge(require APP_DIR . '/common/config/main.ph
             'enableAutoLogin' => true,
         ],
     ],
+    'defaultRoute'        => 'site/index',
 ], require __DIR__ . '/main.local.php');

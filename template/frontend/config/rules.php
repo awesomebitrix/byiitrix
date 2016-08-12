@@ -6,6 +6,7 @@
  */
 
 return [
+    ''                                          => 'site/index',
     '<controller:[\d\w-]+>'                     => '<controller>',
     '<controller:[\d\w-]+>/?'                   => '<controller>',
     '<controller:[\d\w-]+>/<action:[\d\w-]+>'   => '<controller>/<action>',
