@@ -1,8 +1,6 @@
 <?php
 
-namespace byiitrix\helpers\yii;
-
-use yii\helpers\BaseArrayHelper;
+namespace yii\helpers;
 
 class ArrayHelper extends BaseArrayHelper
 {

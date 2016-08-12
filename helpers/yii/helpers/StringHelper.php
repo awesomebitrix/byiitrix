@@ -1,8 +1,6 @@
 <?php
 
-namespace byiitrix\helpers\yii;
-
-use yii\helpers\BaseStringHelper;
+namespace yii\helpers;
 
 class StringHelper extends BaseStringHelper
 {

@@ -14,7 +14,7 @@ class PropertyHelper
     {
         $arOrder  = ['SORT' => 'ASC'];
         $arFilter = [
-            'IBLOCK_ID' => CIBlockHelper::GetIDByCode($iBlockCode),
+            'IBLOCK_ID' => BlockHelper::GetIDByCode($iBlockCode),
         ];
 
         $result = \CIBlockProperty::GetList($arOrder, $arFilter);

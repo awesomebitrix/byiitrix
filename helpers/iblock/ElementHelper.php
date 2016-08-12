@@ -36,7 +36,7 @@ class ElementHelper
     public static function ActiveList($code)
     {
         $list = [];
-        $id   = CIBlockHelper::GetIDByCode($code);
+        $id   = BlockHelper::GetIDByCode($code);
 
         if( $id === NULL ) {
             return $list;
