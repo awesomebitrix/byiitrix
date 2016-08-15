@@ -122,7 +122,15 @@ TEXT;
 
     file_put_contents($webRoot . '/app/index.php', $webIndexContent);
 
-    $nginxConfig = <<<TEXT
+    $config  = $projectRoot . '/frontend/config/main.local.php';
+    $bytes   = openssl_random_pseudo_bytes(32);
+    $key     = strtr(substr(base64_encode($bytes), 0, 32), '+/=', '_-.');
+    $content = preg_replace('/(("|\')cookieValidationKey("|\')\s*=>\s*)(""|\'\')/', "\\1'{$key}'", file_get_contents($config));
+
+    file_put_contents($config, $content);
+
+    if( Console::confirm("Generate nginx configuration stub example in {$projectRoot}/nginx.conf?", ['default' => false]) ) {
+        $nginxConfig = <<<TEXT
 server {
     listen                          0.0.0.0:80;
     server_name                     localhost;
@@ -150,7 +158,9 @@ server {
 
         fastcgi_split_path_info     ^(.+\.php)(/.+)\$;
         fastcgi_pass                127.0.0.1:9000;
-        fastcgi_param               PHP_VALUE open_basedir="/tmp:/bin:/dev/urandom:{$projectRoot}";
+        fastcgi_param               PHP_VALUE "
+                                        open_basedir=\"/tmp:/bin:/dev/urandom:{$projectRoot}\"
+                                    ";
 
         include                     fastcgi_params;
     }
@@ -160,7 +170,11 @@ server {
 
         fastcgi_split_path_info     ^(.+\.php)(/.+)\$;
         fastcgi_pass                127.0.0.1:9000;
-        fastcgi_param               PHP_VALUE open_basedir="/tmp:/bin:/dev/urandom:{$projectRoot}";
+        fastcgi_param               PHP_VALUE "
+                                        open_basedir=\"/tmp:/bin:/dev/urandom:{$projectRoot}\"
+                                        display_errors=Off
+                                        error_reporting=0
+                                    ";
 
         include                     fastcgi_params;
     }
@@ -181,14 +195,6 @@ server {
 
 TEXT;
 
-    echo "Generate nginx vhost configuration stub in {$projectRoot}/nginx.conf" . PHP_EOL;
-
-    file_put_contents($projectRoot . '/nginx.conf', $nginxConfig);
-
-    $config  = $projectRoot . '/frontend/config/main.local.php';
-    $bytes   = openssl_random_pseudo_bytes(32);
-    $key     = strtr(substr(base64_encode($bytes), 0, 32), '+/=', '_-.');
-    $content = preg_replace('/(("|\')cookieValidationKey("|\')\s*=>\s*)(""|\'\')/', "\\1'{$key}'", file_get_contents($config));
-
-    file_put_contents($config, $content);
+        file_put_contents($projectRoot . '/nginx.conf', $nginxConfig);
+    }
 }
