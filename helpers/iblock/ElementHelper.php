@@ -7,7 +7,7 @@ use byiitrix\helpers\BaseHelper;
 class ElementHelper extends BaseHelper
 {
     /**
-     * @param $id
+     * @param integer $id
      *
      * @return \_CIBElement|null
      */
@@ -19,63 +19,141 @@ class ElementHelper extends BaseHelper
             return NULL;
         }
 
-        $arOrder   = [];
-        $arFilter  = ['ID' => $id];
-        $arGroupBy = false;
-        $arNav     = false;
-        $arSelect  = [];
-
-        $result = \CIBlockElement::GetList($arOrder, $arFilter, $arGroupBy, $arNav, $arSelect);
+        $result = \CIBlockElement::GetList(['SORT' => 'ASC'], [
+            'ID'                => $id,
+            'CHECK_PERMISSIONS' => 'N',
+        ]);
 
         return $result->GetNextElement() ? : NULL;
     }
 
     /**
-     * @param $code
+     * @param string         $code
+     * @param integer|string $block
+     * @param string         $type
      *
-     * @return \_CIBElement[]
+     * @return \_CIBElement|null
      */
-    public static function ActiveList($code)
+    public static function GetByCode($code, $block = NULL, $type = NULL)
     {
-        $list = [];
-        $id   = BlockHelper::GetIDByCode($code);
-
-        if( $id === NULL ) {
-            return $list;
-        }
-
-        $arOrder   = ['SORT' => 'ASC'];
-        $arFilter  = [
-            'ACTIVE'    => 'Y',
-            'IBLOCK_ID' => $id,
+        $filter = [
+            'CODE'              => $code,
+            'CHECK_PERMISSIONS' => 'N',
         ];
-        $arGroupBy = false;
-        $arNav     = false;
-        $arSelect  = [];
 
-        $result = \CIBlockElement::GetList($arOrder, $arFilter, $arGroupBy, $arNav, $arSelect);
-
-        while( $row = $result->GetNextElement() ) {
-            $list[$row->fields['ID']] = $row;
+        if( is_numeric($block) ) {
+            $filter['IBLOCK_ID'] = (int)$block;
+        } else {
+            $filter['IBLOCK_CODE'] = $block;
+            $filter['IBLOCK_TYPE'] = $type;
         }
 
-        return $list;
+        $result = \CIBlockElement::GetList(['SORT' => 'ASC'], $filter);
+
+        return $result->GetNextElement() ? : NULL;
     }
 
     /**
-     * @param string $code
+     * @param array $order
+     * @param array $filter
+     * @param bool  $group
+     * @param bool  $nav
+     * @param array $select
      *
      * @return array
      */
-    public static function ActiveNameList($code)
+    public static function GetList($order = ['SORT' => 'ASC'], $filter = [], $group = false, $nav = false, $select = [])
     {
-        $list = self::ActiveList($code);
-        $out  = [];
+        $result = \CIBlockElement::GetList($order, $filter, $group, $nav, $select);
+        $rows   = [];
 
-        foreach( $list as $item ) {
-            $out[$item->fields['ID']] = $item->fields['NAME'];
+        while( $row = $result->GetNext() ) {
+            $rows[] = $row;
         }
 
-        return $out;
+        return $rows;
+    }
+
+    public static function GetListByBlock($block, $type = NULL)
+    {
+        $filter = [
+            'CHECK_PERMISSIONS' => 'N',
+        ];
+
+        if( is_numeric($block) ) {
+            $filter['IBLOCK_ID'] = (int)$block;
+        } else {
+            $filter['IBLOCK_CODE'] = $block;
+            $filter['IBLOCK_TYPE'] = $type;
+        }
+
+        return self::GetList(['SORT' => 'ASC'], $filter);
+    }
+
+    /**
+     * @param array $order
+     * @param array $filter
+     * @param bool  $group
+     * @param bool  $nav
+     * @param array $select
+     *
+     * @return \_CIBElement[]
+     */
+    public static function GetListElements($order = ['SORT' => 'ASC'], $filter = [], $group = false, $nav = false, $select = [])
+    {
+        $result = \CIBlockElement::GetList($order, $filter, $group, $nav, $select);
+        $rows   = [];
+
+        while( $row = $result->GetNextElement() ) {
+            $rows[] = $row;
+        }
+
+        return $rows;
+    }
+
+    public static function GetListElementsByBlock($block, $type = NULL)
+    {
+        $filter = [
+            'CHECK_PERMISSIONS' => 'N',
+        ];
+
+        if( is_numeric($block) ) {
+            $filter['IBLOCK_ID'] = (int)$block;
+        } else {
+            $filter['IBLOCK_CODE'] = $block;
+            $filter['IBLOCK_TYPE'] = $type;
+        }
+
+        return self::GetListElements(['SORT' => 'ASC'], $filter);
+    }
+
+    /**
+     * @param string $block
+     * @param string $type
+     *
+     * @return \_CIBElement[]
+     */
+    public static function ActiveList($block, $type = NULL)
+    {
+        $filter = [
+            'ACTIVE'            => 'Y',
+            'CHECK_PERMISSIONS' => 'N',
+        ];
+
+        if( is_numeric($block) ) {
+            $filter['IBLOCK_ID'] = (int)$block;
+        } else {
+            $filter['IBLOCK_CODE'] = $block;
+            $filter['IBLOCK_TYPE'] = $type;
+        }
+
+        $rows   = [];
+        $result = \CIBlockElement::GetList(['SORT' => 'ASC'], $filter);
+
+        while( $row = $result->GetNextElement() ) {
+            $rows[$row->fields['ID']] = $row;
+        }
+
+        return $rows;
     }
 }

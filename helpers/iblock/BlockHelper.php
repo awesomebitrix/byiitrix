@@ -42,10 +42,6 @@ class BlockHelper extends BaseHelper
             return self::GetIDByCode($code, $type);
         }
 
-        if( preg_match('#code_(.+)$#', $name, $matches) ) {
-            return self::GetCodeByID($matches[1]);
-        }
-
         return NULL;
     }
 
