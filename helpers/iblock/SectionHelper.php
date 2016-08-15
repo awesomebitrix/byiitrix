@@ -2,7 +2,9 @@
 
 namespace byiitrix\helpers\iblock;
 
-class SectionHelper
+use byiitrix\helpers\BaseHelper;
+
+class SectionHelper extends BaseHelper
 {
     /**
      * @param $blockID

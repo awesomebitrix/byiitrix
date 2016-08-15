@@ -172,6 +172,7 @@ server {
         fastcgi_pass                127.0.0.1:9000;
         fastcgi_param               PHP_VALUE "
                                         open_basedir=\"/tmp:/bin:/dev/urandom:{$projectRoot}\"
+                                        mbstring.func_overload=2
                                         display_errors=Off
                                         error_reporting=0
                                     ";

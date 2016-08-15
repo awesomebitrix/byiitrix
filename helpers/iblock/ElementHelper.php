@@ -2,7 +2,9 @@
 
 namespace byiitrix\helpers\iblock;
 
-class ElementHelper
+use byiitrix\helpers\BaseHelper;
+
+class ElementHelper extends BaseHelper
 {
     /**
      * @param $id
@@ -14,7 +16,7 @@ class ElementHelper
         $id = (int)$id;
 
         if( $id <= 0 ) {
-            return false;
+            return NULL;
         }
 
         $arOrder   = [];
