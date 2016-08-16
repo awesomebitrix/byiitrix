@@ -9,10 +9,10 @@ class PropertyEnumHelper extends BaseHelper
     /**
      * Try parse name by regular expression and return whatever you want, like that:
      *
-     * - get_Y_of_USE_SOMETHING_in_city_from_content
+     * - get__Y__of__USE_SOMETHING__in__city__from__content
      * returns IBlockPropertyEnum array with XML_ID: "Y", PROPERTY_CODE: "CONTACTS", IBLOCK_ID: "city" and IBLOCK_TYPE: "content"
      *
-     * - id_Y_of_USE_SOMETHING_in_city_from_content
+     * - id__Y__of__USE_SOMETHING__in__city__from__content
      * returns ID of IBlockPropertyEnum with XML_ID: "Y", PROPERTY_CODE: "CONTACTS", IBLOCK_ID: "city" and IBLOCK_TYPE: "content"
      *
      * @param string $name
@@ -21,7 +21,7 @@ class PropertyEnumHelper extends BaseHelper
      */
     public function __get($name)
     {
-        if( preg_match('#^get_(?P<xml_id>.+?)_of_(?P<prop>.+?)_in_(?P<block>.+?)_from_(?P<type>.+?)$#', $name, $matches) ) {
+        if( preg_match('#^get__(?P<xml_id>.+?)__of__(?P<prop>.+?)__in__(?P<block>.+?)__from__(?P<type>.+?)$#', $name, $matches) ) {
             /**
              * @var string $xml_id
              * @var string $prop
@@ -34,7 +34,7 @@ class PropertyEnumHelper extends BaseHelper
             return self::GetByXmlID($xml_id, $prop, $block, $type);
         }
 
-        if( preg_match('#^id_(?P<xml_id>.+?)_of_(?P<prop>.+?)_in_(?P<block>.+?)_from_(?P<type>.+?)$#', $name, $matches) ) {
+        if( preg_match('#^id__(?P<xml_id>.+?)__of__(?P<prop>.+?)__in__(?P<block>.+?)__from__(?P<type>.+?)$#', $name, $matches) ) {
             /**
              * @var string $xml_id
              * @var string $prop

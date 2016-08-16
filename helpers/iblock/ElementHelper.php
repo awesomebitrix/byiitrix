@@ -54,6 +54,20 @@ class ElementHelper extends BaseHelper
     }
 
     /**
+     * @param string         $code
+     * @param integer|string $block
+     * @param string         $type
+     *
+     * @return int|null
+     */
+    public static function GetIDByCode($code, $block = NULL, $type = NULL)
+    {
+        $element = self::GetByCode($code, $block, $type);
+
+        return isset($element->fields['ID']) ? (int)$element->fields['ID'] : NULL;
+    }
+
+    /**
      * @param array $order
      * @param array $filter
      * @param bool  $group

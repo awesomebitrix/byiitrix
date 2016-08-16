@@ -9,10 +9,10 @@ class PropertyHelper extends BaseHelper
     /**
      * Try parse name by regular expression and return whatever you want, like that:
      *
-     * - get_CONTACTS_in_city_from_content
+     * - get__CONTACTS__in__city__from__content
      * returns IBlockProperty array with CODE: "CONTACTS", IBLOCK_ID: "city" and IBLOCK_TYPE: "content"
      *
-     * - id_CONTACTS_in_city_from_content
+     * - id__CONTACTS__in__city__from__content
      * returns ID of IBlockProperty with CODE: "CONTACTS", IBLOCK_ID: "city" and IBLOCK_TYPE: "content"
      *
      * @param string $name
@@ -21,7 +21,7 @@ class PropertyHelper extends BaseHelper
      */
     public function __get($name)
     {
-        if( preg_match('#^get_(?P<prop>.+?)_in_(?P<block>.+?)_from_(?P<type>.+?)$#', $name, $matches) ) {
+        if( preg_match('#^get__(?P<prop>.+?)__in__(?P<block>.+?)__from__(?P<type>.+?)$#', $name, $matches) ) {
             /**
              * @var string $prop
              * @var string $block
@@ -33,7 +33,7 @@ class PropertyHelper extends BaseHelper
             return self::GetByCode($prop, $block, $type);
         }
 
-        if( preg_match('#^id_(?P<prop>.+?)_in_(?P<block>.+?)_from_(?P<type>.+?)$#', $name, $matches) ) {
+        if( preg_match('#^id__(?P<prop>.+?)__in__(?P<block>.+?)__from__(?P<type>.+?)$#', $name, $matches) ) {
             /**
              * @var string $prop
              * @var string $block

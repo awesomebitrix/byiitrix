@@ -8,10 +8,10 @@ class BlockHelper extends BaseHelper
 {
     /**
      * Try parse name by regular expression and return whatever you want, like that:
-     *  - get_city_from_content
+     *  - get__city__from__content
      * returns IBlock array with CODE: "city" and IBLOCK_TYPE: "content"
      *
-     * - id_city_from_content
+     * - id__city__from__content
      * returns ID of IBlock with CODE: "city" and IBLOCK_TYPE: "content"
      *
      * @param string $name
@@ -20,7 +20,7 @@ class BlockHelper extends BaseHelper
      */
     public function __get($name)
     {
-        if( preg_match('#get_(?P<code>.+?)_from_(?P<type>.+?)$#', $name, $matches) ) {
+        if( preg_match('#get__(?P<code>.+?)__from__(?P<type>.+?)$#', $name, $matches) ) {
             /**
              * @var string $code
              * @var string $type
@@ -31,7 +31,7 @@ class BlockHelper extends BaseHelper
             return self::GetByCode($code, $type);
         }
 
-        if( preg_match('#id_(?P<code>.+?)_from_(?P<type>.+?)$#', $name, $matches) ) {
+        if( preg_match('#id__(?P<code>.+?)__from__(?P<type>.+?)$#', $name, $matches) ) {
             /**
              * @var string $code
              * @var string $type
