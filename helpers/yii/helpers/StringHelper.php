@@ -39,6 +39,9 @@ class StringHelper extends BaseStringHelper
 
             $translate = array_combine($from, $to);
 
+            $input = str_replace(['\\', '"', '"'], ['-', '', ''], $input);
+            $input = preg_replace(['#_#', '#-{2,}#', '#\s{2,}#'], ['-', '-', ' '], $input);
+
             $translate[' '] = '-';
             $translate['_'] = '-';
             $translate['.'] = '-';
@@ -51,5 +54,24 @@ class StringHelper extends BaseStringHelper
         }
 
         return strtolower(trim(preg_replace('#\-\-+#', '-', strtr($input, $translate)), '-'));
+    }
+
+    /**
+     * @param integer $n
+     * @param string  $singular
+     * @param string  $some
+     * @param string  $many
+     *
+     * @return string mixed
+     */
+    public function pluralize($n, $singular, $some, $many)
+    {
+        if( $n % 10 === 1 && $n % 100 !== 11 ) {
+            return str_replace('{n}', $n, $singular);
+        } elseif( $n % 10 >= 2 && $n % 10 <= 4 && ($n % 100 < 10 || $n % 100 >= 20) ) {
+            return str_replace('{n}', $n, $some);
+        } else {
+            return str_replace('{n}', $n, $many);
+        }
     }
 }

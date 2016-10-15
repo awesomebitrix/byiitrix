@@ -3,9 +3,6 @@
 namespace yii\helpers;
 
 use Yii;
-use yii\console\Exception;
-use yii\db\ActiveRecord;
-use yii\web\IdentityInterface;
 
 class Console extends BaseConsole
 {
@@ -16,7 +13,7 @@ class Console extends BaseConsole
      *
      * @return mixed
      */
-    public static function timeout($title, $callback, $params = [])
+    public static function timeout($title, $callback, array $params = [])
     {
         $start = microtime(true);
 

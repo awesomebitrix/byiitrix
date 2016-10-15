@@ -10,7 +10,7 @@ class ArrayHelper extends BaseArrayHelper
     }
 
     /**
-     * @param array|object          $array
+     * @param array|\StdClass       $array
      * @param array|\Closure|string $key
      * @param null                  $default
      *

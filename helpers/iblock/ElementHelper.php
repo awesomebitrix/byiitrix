@@ -8,10 +8,11 @@ class ElementHelper extends BaseHelper
 {
     /**
      * @param integer $id
+     * @param bool    $returnIBElement
      *
-     * @return \_CIBElement|null
+     * @return \_CIBElement|array|null
      */
-    public static function GetByID($id)
+    public static function GetByID($id, $returnIBElement = true)
     {
         $id = (int)$id;
 
@@ -19,22 +20,34 @@ class ElementHelper extends BaseHelper
             return NULL;
         }
 
-        $result = \CIBlockElement::GetList(['SORT' => 'ASC'], [
-            'ID'                => $id,
-            'CHECK_PERMISSIONS' => 'N',
-        ]);
+        if( $result = static::checkCache(__METHOD__, func_get_args()) ) {
+            return $result;
+        } else {
+            $result = \CIBlockElement::GetList(['SORT' => 'ASC'], [
+                'ID'                => $id,
+                'CHECK_PERMISSIONS' => 'N',
+            ]);
 
-        return $result->GetNextElement() ? : NULL;
+            if( $result->SelectedRowsCount() > 0 ) {
+                $result = $returnIBElement ? $result->GetNextElement() : $result->GetNext();
+                self::setCache(__METHOD__, func_get_args(), $result);
+
+                return $result;
+            }
+        }
+
+        return NULL;
     }
 
     /**
      * @param string         $code
      * @param integer|string $block
      * @param string         $type
+     * @param bool           $returnIBElement
      *
      * @return \_CIBElement|null
      */
-    public static function GetByCode($code, $block = NULL, $type = NULL)
+    public static function GetByCode($code, $block = NULL, $type = NULL, $returnIBElement = true)
     {
         $filter = [
             'CODE'              => $code,
@@ -48,9 +61,20 @@ class ElementHelper extends BaseHelper
             $filter['IBLOCK_TYPE'] = $type;
         }
 
-        $result = \CIBlockElement::GetList(['SORT' => 'ASC'], $filter);
+        if( $result = static::checkCache(__METHOD__, func_get_args()) ) {
+            return $result;
+        } else {
+            $result = \CIBlockElement::GetList(['SORT' => 'ASC'], $filter);
 
-        return $result->GetNextElement() ? : NULL;
+            if( $result->SelectedRowsCount() > 0 ) {
+                $result = $returnIBElement ? $result->GetNextElement() : $result->GetNext();
+                self::setCache(__METHOD__, func_get_args(), $result);
+
+                return $result;
+            }
+        }
+
+        return NULL;
     }
 
     /**
@@ -76,7 +100,7 @@ class ElementHelper extends BaseHelper
      *
      * @return array
      */
-    public static function GetList($order = ['SORT' => 'ASC'], $filter = [], $group = false, $nav = false, $select = [])
+    public static function GetList(array $order = ['SORT' => 'ASC'], array $filter = [], $group = false, $nav = false, array $select = [])
     {
         $result = \CIBlockElement::GetList($order, $filter, $group, $nav, $select);
         $rows   = [];
@@ -113,7 +137,7 @@ class ElementHelper extends BaseHelper
      *
      * @return \_CIBElement[]
      */
-    public static function GetListElements($order = ['SORT' => 'ASC'], $filter = [], $group = false, $nav = false, $select = [])
+    public static function GetListElements(array $order = ['SORT' => 'ASC'], array $filter = [], $group = false, $nav = false, array $select = [])
     {
         $result = \CIBlockElement::GetList($order, $filter, $group, $nav, $select);
         $rows   = [];

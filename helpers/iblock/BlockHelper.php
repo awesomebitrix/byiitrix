@@ -4,6 +4,10 @@ namespace byiitrix\helpers\iblock;
 
 use byiitrix\helpers\BaseHelper;
 
+/**
+ * Class BlockHelper
+ * @package byiitrix\helpers\iblock
+ */
 class BlockHelper extends BaseHelper
 {
     /**
@@ -57,9 +61,20 @@ class BlockHelper extends BaseHelper
         $arFilter = ['CODE' => $code, 'TYPE' => $type, 'CHECK_PERMISSIONS' => 'N'];
         $bIncCnt  = false;
 
-        $result = \CIBlock::GetList($arOrder, $arFilter, $bIncCnt);
+        if( $result = static::checkCache(__METHOD__, func_get_args()) ) {
+            return $result;
+        } else {
+            $result = \CIBlock::GetList($arOrder, $arFilter, $bIncCnt);
 
-        return $result->GetNext() ? : NULL;
+            if( $result->SelectedRowsCount() > 0 ) {
+                $result = $result->GetNext();
+                self::setCache(__METHOD__, func_get_args(), $result);
+
+                return $result;
+            }
+        }
+
+        return NULL;
     }
 
     /**
@@ -82,9 +97,19 @@ class BlockHelper extends BaseHelper
      */
     public static function GetCodeByID($id)
     {
-        $result = \CIBlock::GetByID($id);
-        $result = $result->GetNext();
+        if( $result = static::checkCache(__METHOD__, func_get_args()) ) {
+            return isset($result['CODE']) ? $result['CODE'] : NULL;
+        } else {
+            $result = \CIBlock::GetByID($id);
 
-        return isset($result['CODE']) ? $result['CODE'] : NULL;
+            if( $result->SelectedRowsCount() > 0 ) {
+                $result = $result->GetNext();
+                self::setCache(__METHOD__, func_get_args(), $result);
+
+                return isset($result['CODE']) ? $result['CODE'] : NULL;
+            }
+        }
+
+        return NULL;
     }
 }
