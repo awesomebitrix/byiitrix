@@ -33,12 +33,13 @@ if( class_exists('yii\helpers\Console') === false ) {
 $withWeb = Console::confirm('Generate web template and configurations?', ['default' => $withWeb]);
 
 if( Console::confirm("Directory \"{$projectRoot}\" is project root?", ['default' => true]) === false ) {
+    top:
     do {
         $path = Console::prompt('Specify project root path:', ['required' => true]);
 
         if( is_dir($path) === false ) {
-            echo 'Current directory not exists' . PHP_EOL;
-            continue;
+            echo "Directory {$path} not exists" . PHP_EOL;
+            goto top;
         }
 
         $path = realpath($path);
@@ -48,12 +49,17 @@ if( Console::confirm("Directory \"{$projectRoot}\" is project root?", ['default'
 }
 
 if( $withWeb && Console::confirm('Project root is web server root?') === false ) {
+    top2:
     do {
         $path = Console::prompt('Specify web root path:', ['required' => true, 'default' => 'public_html']);
 
+        if( strpos($path, $projectRoot) !== 0 ) {
+            $path = preg_replace('#//+#', '/', rtrim($projectRoot . '/' . $path, '/'));
+        }
+
         if( is_dir($path) === false ) {
-            echo 'Current directory not exists' . PHP_EOL;
-            continue;
+            echo "Directory {$path} not exists" . PHP_EOL;
+            goto top2;
         }
 
         $path = realpath($path);
@@ -98,12 +104,19 @@ foreach( $ignores as $ignore ) {
 }
 
 if( $withWeb ) {
+    $projectDir = 'realpath($_SERVER[\'DOCUMENT_ROOT\'])';
+    $dirParts   = explode('/', trim(str_replace($projectRoot, '', $webRoot), '/'));
+
+    for( $i = count($dirParts); $i > 0; --$i ) {
+        $projectDir = "dirname({$projectDir})";
+    }
+
     $webIndexContent = <<<TEXT
 <?php
 
 require \$_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
 
-require '{$projectRoot}/common/config/define.php';
+require {$projectDir} . '/common/config/define.php';
 
 require APP_DIR . '/vendor/autoload.php';
 require APP_DIR . '/vendor/yiisoft/yii2/Yii.php';
@@ -132,7 +145,7 @@ TEXT;
     if( Console::confirm("Generate nginx configuration stub example in {$projectRoot}/nginx.conf?", ['default' => false]) ) {
         $nginxConfig = <<<TEXT
 server {
-    listen                          0.0.0.0:80;
+    listen                          80;
     server_name                     localhost;
     root                            {$webRoot};
     index                           index.php index.html;
@@ -142,6 +155,20 @@ server {
     include                         /etc/nginx/mime.types;
 
     location / {
+        set \$go_old "";
+
+        if (\$http_user_agent ~* '(MSIE 9.0|MSIE 8.0|MSIE 7.0)') {
+            set \$go_old "\${go_old}1";
+        }
+
+        if (\$uri !~ "^/old-browser.html") {
+            set \$go_old "\${go_old}2";
+        }
+
+        if (\$go_old = 12) {
+            return                  301 /old-browser.html;
+        }
+        
         try_files                   \$uri \$uri/ /index.php\$is_args\$args =404;
 
         if (!-e \$request_filename) {
@@ -158,9 +185,6 @@ server {
 
         fastcgi_split_path_info     ^(.+\.php)(/.+)\$;
         fastcgi_pass                127.0.0.1:9000;
-        fastcgi_param               PHP_VALUE "
-                                        open_basedir=\"/tmp:/bin:/dev/urandom:{$projectRoot}\"
-                                    ";
 
         include                     fastcgi_params;
     }
@@ -171,8 +195,9 @@ server {
         fastcgi_split_path_info     ^(.+\.php)(/.+)\$;
         fastcgi_pass                127.0.0.1:9000;
         fastcgi_param               PHP_VALUE "
-                                        open_basedir=\"/tmp:/bin:/dev/urandom:{$projectRoot}\"
+                                        mbstring.internal_encoding=UTF-8
                                         mbstring.func_overload=2
+                                        opcache.revalidate_freq=0
                                         display_errors=Off
                                         error_reporting=0
                                     ";

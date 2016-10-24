@@ -60,31 +60,33 @@ class PropertyEnumHelper extends BaseHelper
      */
     public static function GetByXmlID($xmlID, $property, $block = NULL, $type = NULL)
     {
-        if( empty($property) ) {
-            return NULL;
-        }
-
-        $blockID = NULL;
-
-        if( is_numeric($property) === false ) {
-            if( empty($block) ) {
+        return self::cache(function () use ($xmlID, $property, $block, $type) {
+            if( empty($property) ) {
                 return NULL;
             }
 
-            $blockID = BlockHelper::GetIDByCode($block, $type);
+            $blockID = NULL;
 
-            if( $blockID === NULL ) {
-                return NULL;
+            if( is_numeric($property) === false ) {
+                if( empty($block) ) {
+                    return NULL;
+                }
+
+                $blockID = BlockHelper::GetIDByCode($block, $type);
+
+                if( $blockID === NULL ) {
+                    return NULL;
+                }
             }
-        }
 
-        $result = \CIBlockPropertyEnum::GetList([], [
-            'PROPERTY_ID' => $property,
-            'IBLOCK_ID'   => $blockID,
-            'XML_ID'      => $xmlID,
-        ]);
+            $result = \CIBlockPropertyEnum::GetList([], [
+                'PROPERTY_ID' => $property,
+                'IBLOCK_ID'   => $blockID,
+                'XML_ID'      => $xmlID,
+            ]);
 
-        return $result->GetNext() ? : NULL;
+            return $result->GetNext() ? : NULL;
+        });
     }
 
     /**
@@ -97,9 +99,11 @@ class PropertyEnumHelper extends BaseHelper
      */
     public static function GetIDByXmlID($xmlID, $property, $block = NULL, $type = NULL)
     {
-        $enum = self::GetByXmlID($xmlID, $property, $block, $type);
+        return self::cache(function () use ($xmlID, $property, $block, $type) {
+            $enum = self::GetByXmlID($xmlID, $property, $block, $type);
 
-        return isset($enum['ID']) ? (int)$enum['ID'] : NULL;
+            return isset($enum['ID']) ? (int)$enum['ID'] : NULL;
+        });
     }
 
     /**
@@ -109,22 +113,24 @@ class PropertyEnumHelper extends BaseHelper
      */
     public static function GetListByPropertyID($propertyID)
     {
-        $list       = [];
-        $propertyID = (int)$propertyID;
+        return self::cache(function () use ($propertyID) {
+            $list       = [];
+            $propertyID = (int)$propertyID;
 
-        if( $propertyID <= 0 ) {
+            if( $propertyID <= 0 ) {
+                return $list;
+            }
+
+            $arOrder  = ['SORT' => 'ASC'];
+            $arFilter = ['PROPERTY_ID' => $propertyID];
+
+            $result = \CIBlockPropertyEnum::GetList($arOrder, $arFilter);
+
+            while( $row = $result->GetNext() ) {
+                $list[$row['ID']] = $row;
+            }
+
             return $list;
-        }
-
-        $arOrder  = ['SORT' => 'ASC'];
-        $arFilter = ['PROPERTY_ID' => $propertyID];
-
-        $result = \CIBlockPropertyEnum::GetList($arOrder, $arFilter);
-
-        while( $row = $result->GetNext() ) {
-            $list[$row['ID']] = $row;
-        }
-
-        return $list;
+        });
     }
 }

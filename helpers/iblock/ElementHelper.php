@@ -20,23 +20,16 @@ class ElementHelper extends BaseHelper
             return NULL;
         }
 
-        if( $result = static::checkCache(__METHOD__, func_get_args()) ) {
-            return $result;
-        } else {
+        return self::cache(function () use ($id, $returnIBElement) {
             $result = \CIBlockElement::GetList(['SORT' => 'ASC'], [
                 'ID'                => $id,
                 'CHECK_PERMISSIONS' => 'N',
             ]);
 
-            if( $result->SelectedRowsCount() > 0 ) {
-                $result = $returnIBElement ? $result->GetNextElement() : $result->GetNext();
-                self::setCache(__METHOD__, func_get_args(), $result);
+            $row = $returnIBElement ? $result->GetNextElement() : $result->GetNext();
 
-                return $result;
-            }
-        }
-
-        return NULL;
+            return $row ? : NULL;
+        });
     }
 
     /**
@@ -49,32 +42,25 @@ class ElementHelper extends BaseHelper
      */
     public static function GetByCode($code, $block = NULL, $type = NULL, $returnIBElement = true)
     {
-        $filter = [
-            'CODE'              => $code,
-            'CHECK_PERMISSIONS' => 'N',
-        ];
+        return self::cache(function () use ($code, $block, $type, $returnIBElement) {
+            $filter = [
+                'CODE'              => $code,
+                'CHECK_PERMISSIONS' => 'N',
+            ];
 
-        if( is_numeric($block) ) {
-            $filter['IBLOCK_ID'] = (int)$block;
-        } else {
-            $filter['IBLOCK_CODE'] = $block;
-            $filter['IBLOCK_TYPE'] = $type;
-        }
+            if( is_numeric($block) ) {
+                $filter['IBLOCK_ID'] = (int)$block;
+            } else {
+                $filter['IBLOCK_CODE'] = $block;
+                $filter['IBLOCK_TYPE'] = $type;
+            }
 
-        if( $result = static::checkCache(__METHOD__, func_get_args()) ) {
-            return $result;
-        } else {
             $result = \CIBlockElement::GetList(['SORT' => 'ASC'], $filter);
 
-            if( $result->SelectedRowsCount() > 0 ) {
-                $result = $returnIBElement ? $result->GetNextElement() : $result->GetNext();
-                self::setCache(__METHOD__, func_get_args(), $result);
+            $row = $returnIBElement ? $result->GetNextElement() : $result->GetNext();
 
-                return $result;
-            }
-        }
-
-        return NULL;
+            return $row ? : NULL;
+        });
     }
 
     /**

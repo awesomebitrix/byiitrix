@@ -8,8 +8,6 @@ namespace byiitrix\helpers;
  */
 abstract class BaseHelper
 {
-    private static $cache = [];
-
     final private function __construct()
     {
     }
@@ -32,37 +30,21 @@ abstract class BaseHelper
         return $instances[static::class];
     }
 
-    /**
-     * @param string       $method
-     * @param string|array $cacheKey
-     * @param string|array $cacheValue
-     */
-    public static function setCache($method, $cacheKey, $cacheValue)
-    {
-        $key                 = self::generateCacheKey($method, $cacheKey);
-        static::$cache[$key] = $cacheValue;
-    }
+    private static $cache = [];
 
     /**
-     * @param mixed $cacheKey
+     * @param \Closure $callable
      *
-     * @return null|mixed
+     * @return mixed
      */
-    protected static function checkCache($method, $cacheKey)
+    protected static function cache($callable)
     {
-        $key = self::generateCacheKey($method, $cacheKey);
+        $key = serialize(debug_backtrace()[1]);
 
-        return isset(static::$cache[$key]) ? static::$cache[$key] : NULL;
-    }
+        if( array_key_exists($key, self::$cache) === false ) {
+            self::$cache[$key] = call_user_func($callable);
+        }
 
-    /**
-     * @param string $method
-     * @param mixed $cacheKey
-     *
-     * @return string
-     */
-    private static function generateCacheKey($method, $cacheKey)
-    {
-        return $method . serialize($cacheKey);
+        return self::$cache[$key];
     }
 }

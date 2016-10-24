@@ -57,24 +57,11 @@ class BlockHelper extends BaseHelper
      */
     public static function GetByCode($code, $type = NULL)
     {
-        $arOrder  = ['SORT' => 'ASC'];
-        $arFilter = ['CODE' => $code, 'TYPE' => $type, 'CHECK_PERMISSIONS' => 'N'];
-        $bIncCnt  = false;
+        return self::cache(function () use ($code, $type) {
+            $result = \CIBlock::GetList(['SORT' => 'ASC'], ['CODE' => $code, 'TYPE' => $type, 'CHECK_PERMISSIONS' => 'N'], false);
 
-        if( $result = static::checkCache(__METHOD__, func_get_args()) ) {
-            return $result;
-        } else {
-            $result = \CIBlock::GetList($arOrder, $arFilter, $bIncCnt);
-
-            if( $result->SelectedRowsCount() > 0 ) {
-                $result = $result->GetNext();
-                self::setCache(__METHOD__, func_get_args(), $result);
-
-                return $result;
-            }
-        }
-
-        return NULL;
+            return $result->GetNext() ? : NULL;
+        });
     }
 
     /**
@@ -97,19 +84,11 @@ class BlockHelper extends BaseHelper
      */
     public static function GetCodeByID($id)
     {
-        if( $result = static::checkCache(__METHOD__, func_get_args()) ) {
-            return isset($result['CODE']) ? $result['CODE'] : NULL;
-        } else {
+        return self::cache(function () use ($id) {
             $result = \CIBlock::GetByID($id);
+            $row    = $result->GetNext() ? : NULL;
 
-            if( $result->SelectedRowsCount() > 0 ) {
-                $result = $result->GetNext();
-                self::setCache(__METHOD__, func_get_args(), $result);
-
-                return isset($result['CODE']) ? $result['CODE'] : NULL;
-            }
-        }
-
-        return NULL;
+            return isset($row['CODE']) ? $row['CODE'] : NULL;
+        });
     }
 }

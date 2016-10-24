@@ -38,22 +38,13 @@ class StringHelper extends BaseStringHelper
             }
 
             $translate = array_combine($from, $to);
-
-            $input = str_replace(['\\', '"', '"'], ['-', '', ''], $input);
-            $input = preg_replace(['#_#', '#-{2,}#', '#\s{2,}#'], ['-', '-', ' '], $input);
-
-            $translate[' '] = '-';
-            $translate['_'] = '-';
-            $translate['.'] = '-';
-            $translate[','] = '-';
-            $translate['%'] = '-';
-            $translate['!'] = '-';
-            $translate['?'] = '-';
-            $translate['@'] = '-';
-            $translate['#'] = '-';
         }
 
-        return strtolower(trim(preg_replace('#\-\-+#', '-', strtr($input, $translate)), '-'));
+        $input = strtr($input, $translate);
+        $input = preg_replace('#\W#', '-', $input);
+        $input = preg_replace('#\-\-+#', '-', $input);
+
+        return strtolower(trim($input, '-'));
     }
 
     /**

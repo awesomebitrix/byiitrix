@@ -57,23 +57,25 @@ class PropertyHelper extends BaseHelper
      */
     public static function GetByCode($code, $block, $type = NULL)
     {
-        $blockID = (int)$block;
+        return self::cache(function () use ($code, $block, $type) {
+            $blockID = (int)$block;
 
-        if( is_numeric($block) === false ) {
-            $blockID = BlockHelper::GetIDByCode($block, $type);
-        }
+            if( is_numeric($block) === false ) {
+                $blockID = BlockHelper::GetIDByCode($block, $type);
+            }
 
-        if( empty($blockID) ) {
-            return NULL;
-        }
+            if( empty($blockID) ) {
+                return NULL;
+            }
 
-        $result = \CIBlockProperty::GetList([], [
-            'IBLOCK_ID'         => $blockID,
-            'CODE'              => $code,
-            'CHECK_PERMISSIONS' => 'N',
-        ]);
+            $result = \CIBlockProperty::GetList([], [
+                'IBLOCK_ID'         => $blockID,
+                'CODE'              => $code,
+                'CHECK_PERMISSIONS' => 'N',
+            ]);
 
-        return $result->GetNext() ? : NULL;
+            return $result->GetNext() ? : NULL;
+        });
     }
 
     /**
@@ -85,37 +87,41 @@ class PropertyHelper extends BaseHelper
      */
     public static function GetIDByCode($code, $block, $type = NULL)
     {
-        $property = self::GetByCode($code, $block, $type);
+        return self::cache(function () use ($code, $block, $type) {
+            $property = self::GetByCode($code, $block, $type);
 
-        return isset($property['ID']) ? (int)$property['ID'] : NULL;
+            return isset($property['ID']) ? (int)$property['ID'] : NULL;
+        });
     }
 
     /**
-     * @param string $iBlockCode
+     * @param string $blockCode
      * @param bool   $keyAsCode
      *
      * @return array
      */
-    public static function ActiveList($iBlockCode, $keyAsCode = false)
+    public static function ActiveList($blockCode, $keyAsCode = false)
     {
-        $arOrder  = ['SORT' => 'ASC'];
-        $arFilter = [
-            'IBLOCK_ID' => BlockHelper::GetIDByCode($iBlockCode),
-        ];
+        return self::cache(function () use ($blockCode, $keyAsCode) {
+            $arOrder  = ['SORT' => 'ASC'];
+            $arFilter = [
+                'IBLOCK_ID' => BlockHelper::GetIDByCode($blockCode),
+            ];
 
-        $result = \CIBlockProperty::GetList($arOrder, $arFilter);
-        $out    = [];
+            $result = \CIBlockProperty::GetList($arOrder, $arFilter);
+            $out    = [];
 
-        while( $row = $result->GetNext() ) {
-            $key = $row['ID'];
+            while( $row = $result->GetNext() ) {
+                $key = $row['ID'];
 
-            if( $keyAsCode === true && !empty($row['CODE']) ) {
-                $key = $row['CODE'];
+                if( $keyAsCode === true && !empty($row['CODE']) ) {
+                    $key = $row['CODE'];
+                }
+
+                $out[$key] = $row;
             }
 
-            $out[$key] = $row;
-        }
-
-        return $out;
+            return $out;
+        });
     }
 }
