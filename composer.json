@@ -31,13 +31,13 @@
     },
     "bin":         ["bin/byiitrix"],
     "require":     {
-        "yiisoft/yii2":             "^2.0.9",
+        "yiisoft/yii2":             "^2.0.10",
         "yiisoft/yii2-bootstrap":   "^2.0.6",
-        "yiisoft/yii2-swiftmailer": "^2.0.5",
+        "yiisoft/yii2-swiftmailer": "^2.0.6",
         "yiisoft/yii2-jui":         "^2.0.6",
-        "bower-asset/fontawesome":  "^4.6.3",
+        "bower-asset/fontawesome":  "^4.7.0",
         "bower-asset/underscore":   "^1.8.3",
-        "bower-asset/moment":       "^2.14.1"
+        "bower-asset/moment":       "^2.15.2"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "^2.0.5",
