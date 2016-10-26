@@ -10,7 +10,7 @@ $templateDir = $byiitrixDir . '/template';
 $autoload    = $byiitrixDir . '/vendor/autoload.php';
 
 $projectRoot = realpath('.');
-$webRoot     = $projectRoot;
+$webRoot     = $projectRoot . '/public_html';
 $withWeb     = false;
 
 /**
@@ -30,42 +30,55 @@ if( class_exists('yii\helpers\Console') === false ) {
     throw new \Exception('Can not resolve yii core classes.');
 }
 
-$withWeb = Console::confirm('Generate web template and configurations?', ['default' => $withWeb]);
+$withWeb = Console::confirm('Generate web template and configurations?', true);
 
-if( Console::confirm("Directory \"{$projectRoot}\" is project root?", ['default' => true]) === false ) {
-    top:
-    do {
-        $path = Console::prompt('Specify project root path:', ['required' => true]);
+while( Console::confirm("Directory \"{$projectRoot}\" is project root. Confirm?", true) === false ) {
+    read_project_root:
+    $path = Console::prompt('Specify project root path:', ['required' => true]);
+    $path = realpath($path);
 
-        if( is_dir($path) === false ) {
-            echo "Directory {$path} not exists" . PHP_EOL;
-            goto top;
-        }
+    if( $path === false ) {
+        echo 'Directory not exists' . PHP_EOL;
+        goto read_project_root;
+    }
 
-        $path = realpath($path);
-    } while( Console::confirm("Directory \"{$path}\" is project root. Confirm?") === false );
+    if( is_dir($path) === false ) {
+        echo "Directory {$path} is not directory" . PHP_EOL;
+        goto read_project_root;
+    }
+
+    if( is_writable($path) === false ) {
+        echo "Directory {$path} is not writable" . PHP_EOL;
+        goto read_project_root;
+    }
 
     $projectRoot = $path;
 }
 
-if( $withWeb && Console::confirm('Project root is web server root?') === false ) {
-    top2:
-    do {
+if( $withWeb ) {
+    while( Console::confirm("Directory \"{$webRoot}\" is web root. Confirm?", true) === false ) {
+        read_web_root:
         $path = Console::prompt('Specify web root path:', ['required' => true, 'default' => 'public_html']);
 
+        if( strpos($path, '/') !== 0 ) {
+            $path = $projectRoot . '/' . $path;
+        }
+
         if( strpos($path, $projectRoot) !== 0 ) {
-            $path = preg_replace('#//+#', '/', rtrim($projectRoot . '/' . $path, '/'));
+            echo 'Web root should contains in project root' . PHP_EOL;
+            goto read_web_root;
         }
 
         if( is_dir($path) === false ) {
-            echo "Directory {$path} not exists" . PHP_EOL;
-            goto top2;
+            if( Console::confirm("Directory {$path} not exists. Create?", true) ) {
+                \yii\helpers\FileHelper::createDirectory($path);
+            } else {
+                goto read_web_root;
+            }
         }
 
-        $path = realpath($path);
-    } while( Console::confirm("Directory \"{$path}\" is web root. Confirm?", ['default' => true]) === false );
-
-    $webRoot = $path;
+        $webRoot = $path;
+    }
 }
 
 echo 'Copy template files in project root...' . PHP_EOL;
@@ -103,6 +116,67 @@ foreach( $ignores as $ignore ) {
     }
 }
 
+if( Console::confirm('Generate default .htaccess in web root?', true) ) {
+    $htaccess = <<<TEXT
+Options -Indexes
+ErrorDocument 404 /404.php
+
+<IfModule mod_php5.c>
+  php_flag session.use_trans_sid off
+  #php_value display_errors 1
+  #php_value mbstring.internal_encoding UTF-8
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  Options +FollowSymLinks
+  RewriteEngine On
+  RewriteCond %{HTTP_USER_AGENT} "MSIE [6-9]" [NC]
+  RewriteCond %{REQUEST_FILENAME} !/old-browser.html$
+  RewriteCond %{REQUEST_FILENAME} !/old-browser/
+  RewriteRule ^(.*)$ /old-browser.html [R=301,L]
+#APP_REDIRECT#
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-l
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !/bitrix/urlrewrite.php$
+  RewriteRule ^(.*)$ /bitrix/urlrewrite.php [L]
+  RewriteRule .* - [E=REMOTE_USER:%{HTTP:Authorization}]
+</IfModule>
+
+<IfModule mod_dir.c>
+  DirectoryIndex index.php index.html
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive on
+  ExpiresByType image/jpeg "access plus 3 day"
+  ExpiresByType image/gif "access plus 3 day"
+  ExpiresByType image/png "access plus 3 day"
+  ExpiresByType text/css "access plus 3 day"
+  ExpiresByType application/javascript "access plus 3 day"
+</IfModule>
+
+TEXT;
+
+    if( $withWeb ) {
+        $appRedirect = <<<TEXT
+
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-l
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} /app/
+  RewriteRule ^(.*)$ /app/index.php [L]
+
+TEXT;
+
+        $htaccess = str_replace('#APP_REDIRECT#', $appRedirect, $htaccess);
+    } else {
+        $htaccess = str_replace('#APP_REDIRECT#', '', $htaccess);
+    }
+
+    file_put_contents($webRoot . '/.htaccess', $htaccess);
+}
+
 if( $withWeb ) {
     $projectDir = 'realpath($_SERVER[\'DOCUMENT_ROOT\'])';
     $dirParts   = explode('/', trim(str_replace($projectRoot, '', $webRoot), '/'));
@@ -116,11 +190,11 @@ if( $withWeb ) {
 
 require \$_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
 
-require {$projectDir} . '/common/config/define.php';
+require_once {$projectDir} . '/common/config/define.php';
 
-require APP_DIR . '/vendor/autoload.php';
-require APP_DIR . '/vendor/yiisoft/yii2/Yii.php';
-require APP_DIR . '/common/config/bootstrap.php';
+require_once APP_DIR . '/vendor/autoload.php';
+require_once APP_DIR . '/vendor/yiisoft/yii2/Yii.php';
+require_once APP_DIR . '/common/config/bootstrap.php';
 
 \$config = require APP_DIR . '/frontend/config/main.php';
 
@@ -142,7 +216,7 @@ TEXT;
 
     file_put_contents($config, $content);
 
-    if( Console::confirm("Generate nginx configuration stub example in {$projectRoot}/nginx.conf?", ['default' => false]) ) {
+    if( Console::confirm('Generate default nginx.conf in project root?', true) ) {
         $nginxConfig = <<<TEXT
 server {
     listen                          80;
