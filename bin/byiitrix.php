@@ -108,7 +108,7 @@ $ignores = [
 echo 'Add local files to gitignore' . PHP_EOL;
 
 $gitIgnore        = $projectRoot . '/.gitignore';
-$gitignoreContent = file_get_contents($gitIgnore);
+$gitignoreContent = file_exists($gitIgnore) ? file_get_contents($gitIgnore) : '';
 
 foreach( $ignores as $ignore ) {
     if( $ignore !== NULL && preg_match('#' . preg_quote($ignore, '#') . '#', $gitignoreContent) === 0 ) {
