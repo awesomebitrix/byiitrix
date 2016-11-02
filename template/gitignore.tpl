@@ -1,0 +1,9 @@
+.DS_Store
+/.idea
+/public_html/bitrix
+/public_html/upload
+/vendor
+/node_modules
+TestController.php
+*.local.php
+*.local.json

@@ -3,7 +3,7 @@
  * Main frontend configuration file
  */
 
-return \yii\helpers\ArrayHelper::merge(require APP_DIR . '/common/config/main.php', [
+return \yii\helpers\ArrayHelper::merge(require APP_ROOT . '/common/config/main.php', [
     'id'                  => 'app-frontend',
     'basePath'            => dirname(__DIR__),
     'bootstrap'           => ['log'],
@@ -43,4 +43,4 @@ return \yii\helpers\ArrayHelper::merge(require APP_DIR . '/common/config/main.ph
         ],
     ],
     'defaultRoute'        => 'site/index',
-], require __DIR__ . '/main.local.php');
+], file_exists(__DIR__ . '/main.local.php') ? require __DIR__ . '/main.local.php' : []);

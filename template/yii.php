@@ -9,11 +9,6 @@ $_SERVER['DOCUMENT_ROOT'] = __DIR__ . '/public_html';
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
 
-require_once __DIR__ . '/common/config/define.php';
-require_once __DIR__ . '/vendor/autoload.php';
-require_once __DIR__ . '/vendor/yiisoft/yii2/Yii.php';
-require_once __DIR__ . '/common/config/bootstrap.php';
-
 $config      = require __DIR__ . '/console/config/main.php';
 $application = new \common\console\Application($config);
 $exitCode    = $application->run();

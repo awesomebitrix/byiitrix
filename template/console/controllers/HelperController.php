@@ -67,7 +67,7 @@ namespace {$namespace};
  *{$idComments}
  *{$getComments}
  */
-class {$className} extends \\byiitrix\helpers\iblock\\{$className}
+class {$className} extends \\byiitrix\helpers\\{$className}
 {
 }
 PHP;
@@ -116,7 +116,7 @@ namespace {$namespace};
  *{$idComments}
  *{$getComments}
  */
-class {$className} extends \\byiitrix\helpers\iblock\\{$className}
+class {$className} extends \\byiitrix\helpers\\{$className}
 {
 }
 PHP;
@@ -169,7 +169,7 @@ namespace {$namespace};
  *{$idComments}
  *{$getComments}
  */
-class {$className} extends \\byiitrix\helpers\iblock\\{$className}
+class {$className} extends \\byiitrix\helpers\\{$className}
 {
 }
 PHP;

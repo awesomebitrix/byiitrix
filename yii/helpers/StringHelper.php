@@ -43,6 +43,7 @@ class StringHelper extends BaseStringHelper
         $input = strtr($input, $translate);
         $input = preg_replace('#\W#', '-', $input);
         $input = preg_replace('#\-\-+#', '-', $input);
+        $input = iconv('UTF-8', 'ASCII//TRANSLIT', $input);
 
         return strtolower(trim($input, '-'));
     }

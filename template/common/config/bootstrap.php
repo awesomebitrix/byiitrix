@@ -2,14 +2,15 @@
 /**
  */
 
-Yii::setAlias('console', APP_DIR . '/console');
-Yii::setAlias('common', APP_DIR . '/common');
-Yii::setAlias('public', APP_DIR . '/public_html');
-Yii::setAlias('bitrix', APP_DIR . '/public_html/bitrix');
-Yii::setAlias('frontend', APP_DIR . '/frontend');
-Yii::setAlias('upload', APP_DIR . '/public_html/upload');
-Yii::setAlias('byiitrix', APP_DIR . '/vendor/ksaitechnologies/byiitrix');
+Yii::setAlias('console', APP_ROOT . '/console');
+Yii::setAlias('common', APP_ROOT . '/common');
+Yii::setAlias('public', APP_ROOT . '/public_html');
+Yii::setAlias('bitrix', APP_ROOT . '/public_html/bitrix');
+Yii::setAlias('frontend', APP_ROOT . '/frontend');
+Yii::setAlias('upload', WEB_ROOT . '/upload');
+Yii::setAlias('core', WEB_ROOT . '/local/php_interface/core');
+Yii::setAlias('byiitrix', APP_ROOT . '/vendor/ksaitechnologies/byiitrix');
 
-Yii::$classMap['yii\helpers\ArrayHelper']  = '@byiitrix/helpers/yii/helpers/ArrayHelper.php';
-Yii::$classMap['yii\helpers\StringHelper'] = '@byiitrix/helpers/yii/helpers/StringHelper.php';
-Yii::$classMap['yii\helpers\Console']      = '@byiitrix/helpers/yii/helpers/Console.php';
+Yii::$classMap['yii\helpers\ArrayHelper']  = '@byiitrix/yii/helpers/ArrayHelper.php';
+Yii::$classMap['yii\helpers\StringHelper'] = '@byiitrix/yii/helpers/StringHelper.php';
+Yii::$classMap['yii\helpers\Console']      = '@byiitrix/yii/helpers/Console.php';
