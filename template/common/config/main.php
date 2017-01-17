@@ -1,4 +1,10 @@
 <?php
+
+use yii\swiftmailer\Mailer;
+use yii\caching\MemCache;
+use yii\caching\FileCache;
+use common\bitrix\ServiceLocator;
+
 /**
  * Main common configuration file
  */
@@ -14,12 +20,12 @@ return \yii\helpers\ArrayHelper::merge([
     'basePath'    => dirname(__DIR__),
     'components'  => [
         'bitrix' => [
-            'class' => 'common\bitrix\ServiceLocator',
+            'class' => ServiceLocator::class,
         ],
         'cache'  => [
-            'class' => 'yii\caching\FileCache',
-            // 'class' => 'yii\caching\MemCache',
-            // 'keyPrefix' => 'byiitrix:',
+            'class' => FileCache::class,
+            //'class'     => MemCache::class,
+            //'keyPrefix' => 'byiitrix:',
         ],
         'db'     => [
             'class'               => 'yii\db\Connection',
@@ -32,7 +38,7 @@ return \yii\helpers\ArrayHelper::merge([
             'schemaCache'         => 'cache',
         ],
         'mailer' => [
-            'class'    => 'yii\swiftmailer\Mailer',
+            'class'    => Mailer::class,
             'viewPath' => '@common/mail',
         ],
     ],

@@ -2,11 +2,9 @@
 
 namespace frontend\controllers;
 
-use common\models\api\LoginTokenApi;
-use frontend\models\RegisterPartnershipForm;
 use Yii;
+use yii\web\ErrorAction;
 use common\web\Controller;
-use frontend\models\ContactForm;
 
 /**
  * Site controller
@@ -17,7 +15,7 @@ class SiteController extends Controller
     {
         return [
             'error'   => [
-                'class' => 'yii\web\ErrorAction',
+                'class' => ErrorAction::class,
             ],
         ];
     }

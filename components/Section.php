@@ -182,6 +182,7 @@ SQL;
      * @param string $type
      *
      * @return array
+     * @throws \Exception
      */
     public function listOf($block, $type)
     {
@@ -228,6 +229,7 @@ SQL;
      * @param string       $type
      *
      * @return array
+     * @throws \Exception
      */
     public function childrenOf($parent, $block, $type)
     {

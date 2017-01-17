@@ -3,6 +3,7 @@
 namespace common\bitrix;
 
 use yii\helpers\ArrayHelper;
+use Bitrix\Main\Data\StaticHtmlCache;
 
 /**
  * Class ServiceLocator
@@ -18,23 +19,24 @@ class ServiceLocator extends \yii\di\ServiceLocator
     public function __construct(array $config = [])
     {
         $config['components'] = ArrayHelper::merge([
-            'block'        => [
-                'class' => 'common\bitrix\components\Block',
-            ],
-            'property'     => [
-                'class' => 'common\bitrix\components\Property',
-            ],
-            'propertyEnum' => [
-                'class' => 'common\bitrix\components\PropertyEnum',
-            ],
-            'element'      => [
-                'class' => 'common\bitrix\components\Element',
-            ],
-            'section'      => [
-                'class' => 'common\bitrix\components\Section',
-            ],
+            'block'        => components\Block::class,
+            'property'     => components\Property::class,
+            'propertyEnum' => components\PropertyEnum::class,
+            'element'      => components\Element::class,
+            'section'      => components\Section::class,
         ], isset($config['components']) ? $config['components'] : []);
 
         parent::__construct($config);
+    }
+
+    /**
+     * Clear all bitrix cache containers
+     */
+    public function flushCache()
+    {
+        \BXClearCache(true);
+        $GLOBALS['CACHE_MANAGER']->CleanAll();
+        $GLOBALS['stackCacheManager']->CleanAll();
+        StaticHtmlCache::getInstance()->deleteAll();
     }
 }

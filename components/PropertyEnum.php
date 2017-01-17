@@ -122,7 +122,7 @@ SQL;
         $value = $cache->get($key);
 
         if( $value === false ) {
-            $value = \CIBlockPropertyEnum::GetByID($this->id($xmlID, $property, $block, $type))->GetNext() ? : NULL;
+            $value = \CIBlockPropertyEnum::GetByID($this->id($xmlID, $property, $block, $type)) ? : NULL;
 
             $cache->set($key, $value, 30);
         }
@@ -136,6 +136,7 @@ SQL;
      * @param string $type
      *
      * @return array|bool|mixed
+     * @throws \Exception
      */
     public function listOf($property, $block, $type)
     {

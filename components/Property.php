@@ -67,7 +67,7 @@ class Property
      * Empty setter, nothing to do
      *
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      */
     public function __set($name, $value)
     {
@@ -142,6 +142,7 @@ SQL;
      * @param string $type
      *
      * @return array
+     * @throws \Exception
      */
     public function listOf($block, $type)
     {

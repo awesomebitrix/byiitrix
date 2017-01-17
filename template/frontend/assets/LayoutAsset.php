@@ -2,6 +2,8 @@
 
 namespace frontend\assets;
 
+use yii\web\YiiAsset;
+use yii\bootstrap\BootstrapAsset;
 use common\web\AssetBundle;
 
 class LayoutAsset extends AssetBundle
@@ -12,7 +14,7 @@ class LayoutAsset extends AssetBundle
         'css/layout.css',
     ];
     public $depends  = [
-        'yii\web\YiiAsset',
-        'yii\bootstrap\BootstrapAsset',
+        YiiAsset::class,
+        BootstrapAsset::class,
     ];
 }

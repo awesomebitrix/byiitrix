@@ -2,9 +2,6 @@
 
 namespace common\bitrix;
 
-use yii\base\Request;
-use yii\base\Response;
-
 /**
  * Class Application
  * @package common\bitrix
@@ -13,9 +10,9 @@ use yii\base\Response;
 class Application extends \yii\base\Application
 {
     /**
-     * @param Request $request the request to be handled
+     * @param \yii\base\Request $request the request to be handled
      *
-     * @return Response the resulting response
+     * @return \yii\base\Response the resulting response
      */
     public function handleRequest($request)
     {
@@ -28,9 +25,9 @@ class Application extends \yii\base\Application
     public function coreComponents()
     {
         return array_merge(parent::coreComponents(), [
-            'errorHandler' => ['class' => 'common\bitrix\ErrorHandler'],
-            'response'     => ['class' => 'common\bitrix\Response'],
-            'request'      => ['class' => 'common\bitrix\Request'],
+            'errorHandler' => ['class' => ErrorHandler::class],
+            'response'     => ['class' => Response::class],
+            'request'      => ['class' => Request::class],
         ]);
     }
 

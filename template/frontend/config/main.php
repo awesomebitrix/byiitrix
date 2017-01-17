@@ -1,4 +1,11 @@
 <?php
+
+use yii\log\FileTarget;
+use common\web\User;
+use common\web\View;
+use common\web\Request;
+use common\web\Response;
+
 /**
  * Main frontend configuration file
  */
@@ -16,19 +23,19 @@ return \yii\helpers\ArrayHelper::merge(require APP_ROOT . '/common/config/main.p
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets'    => [
                 [
-                    'class'  => 'yii\log\FileTarget',
+                    'class'  => FileTarget::class,
                     'levels' => ['error', 'warning'],
                 ],
             ],
         ],
         'response'     => [
-            'class' => 'common\web\Response',
+            'class' => Response::class,
         ],
         'request'      => [
-            'class' => 'common\web\Request',
+            'class' => Request::class,
         ],
         'view'         => [
-            'class' => 'common\web\View',
+            'class' => View::class,
         ],
         'urlManager'   => [
             'enablePrettyUrl' => true,
@@ -36,8 +43,8 @@ return \yii\helpers\ArrayHelper::merge(require APP_ROOT . '/common/config/main.p
             'rules'           => require __DIR__ . '/rules.php',
         ],
         'user'         => [
-            'class'           => 'common\web\User',
-            'identityClass'   => 'common\models\User',
+            'class'           => User::class,
+            'identityClass'   => \common\models\User::class,
             'loginUrl'        => ['/auth/login'],
             'enableAutoLogin' => true,
         ],
