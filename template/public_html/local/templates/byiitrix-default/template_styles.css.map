@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAEA,UAAW,GACP,gBAAgB,EAAE,OAAO,EACzB,KAAK,ECJY,OAAO",
+"sources": ["template_styles.scss","../../_vars.scss"],
+"names": [],
+"file": "template_styles.css"
+}
