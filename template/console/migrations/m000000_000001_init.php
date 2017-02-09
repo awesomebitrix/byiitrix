@@ -39,7 +39,7 @@ class m000000_000001_init extends Migration
             'SITE_ID'   => \core\Codex::SITE_ID_MAIN,
             'CONDITION' => '',
             'SORT'      => 1,
-            'TEMPLATE'  => 'zm',
+            'TEMPLATE'  => 'byiitrix-default',
          ]);
          */
 
