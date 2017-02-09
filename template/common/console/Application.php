@@ -5,7 +5,7 @@ namespace common\console;
 use yii\console\controllers\AssetController;
 use yii\console\controllers\CacheController;
 use yii\console\controllers\FixtureController;
-use yii\console\controllers\HelpController;
+use console\controllers\HelpController;
 use yii\console\controllers\MessageController;
 use yii\console\controllers\ServeController;
 use console\controllers\MigrateController;

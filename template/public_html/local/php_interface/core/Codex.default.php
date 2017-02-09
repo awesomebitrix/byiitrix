@@ -17,7 +17,7 @@ class Codex
     const GROUP_ID_RATE_RIGHT      = 3; //Пользователи, имеющие право голосовать за рейтинг
     const GROUP_ID_AUTHORITY_RIGHT = 4; //Пользователи имеющие право голосовать за авторитет
 
-    const TYPE_SYSTEM  = 'system';
-    const TYPE_CONTENT = 'content';
-    const TYPE_CATALOG = 'catalog';
+    const TYPE_SYSTEM  = 'SYSTEM';
+    const TYPE_CONTENT = 'CONTENT';
+    const TYPE_CATALOG = 'CATALOG';
 }
