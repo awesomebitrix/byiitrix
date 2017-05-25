@@ -19,6 +19,17 @@ class Application extends \yii\base\Application
         return $this->getResponse();
     }
 
+    protected function bootstrap()
+    {
+        parent::bootstrap();
+
+        \Yii::$block        = \Yii::$app->bitrix->block;
+        \Yii::$element      = \Yii::$app->bitrix->element;
+        \Yii::$property     = \Yii::$app->bitrix->property;
+        \Yii::$propertyEnum = \Yii::$app->bitrix->propertyEnum;
+        \Yii::$section      = \Yii::$app->bitrix->section;
+    }
+
     /**
      * @return array
      */

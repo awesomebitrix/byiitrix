@@ -43,9 +43,17 @@
         "yiisoft/yii2-codeception": "^2.0.5",
         "yiisoft/yii2-debug":       "^2.0.7",
         "yiisoft/yii2-gii":         "^2.0.5",
-        "yiisoft/yii2-faker":       "^2.0.3"
+        "yiisoft/yii2-faker":       "^2.0.3",
+        "fzaninotto/faker":         "^1.6",
+        "kint-php/kint":            "^2.0"
     },
     "config":      {
-        "process-timeout": 1800
+        "process-timeout": 1800,
+        "fxp-asset":       {
+            "installer-paths": {
+                "npm-asset-library":   "vendor/npm",
+                "bower-asset-library": "vendor/bower"
+            }
+        }
     }
 }

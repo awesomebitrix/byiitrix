@@ -22,15 +22,15 @@ define('BX_CACHE_SID', md5($_SERVER['HTTP_HOST'] . $_SERVER['DOCUMENT_ROOT']));
 
 require APP_ROOT . '/vendor/autoload.php';
 require APP_ROOT . '/common/config/define.php';
-require APP_ROOT . '/vendor/yiisoft/yii2/Yii.php';
+require APP_ROOT . '/common/Yii.php';
 require APP_ROOT . '/common/config/bootstrap.php';
 
 \CModule::IncludeModule('iblock');
 
 if( defined('YII_CUSTOM_APP') === false ) {
-    \AddEventHandler('main', 'OnBeforeProlog', function () {
+    //\AddEventHandler('main', 'OnBeforeProlog', function () {
         $app = new \common\bitrix\Application(require APP_ROOT . '/common/config/main.php');
 
         $app->run();
-    });
+    //});
 }

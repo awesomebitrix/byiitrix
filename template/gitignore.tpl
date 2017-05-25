@@ -4,6 +4,6 @@
 /public_html/upload
 /vendor
 /node_modules
-TestController.php
+/console/controllers/TestController.php
 *.local.php
 *.local.json

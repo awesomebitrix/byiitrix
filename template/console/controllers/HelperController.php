@@ -9,13 +9,18 @@ class HelperController extends Controller
 {
     private function helperNamespace()
     {
-        return 'core\helpers';
+        return 'common\bitrix\components';
+    }
+
+    private function helperPattern()
+    {
+        return '#( \* \@internal\s\{begin\}).*( \* \@internal \{end\})#Us';
     }
 
     private function helperPath()
     {
         $namespace = $this->helperNamespace();
-        $path      = $_SERVER['DOCUMENT_ROOT'] . '/local/php_interface/' . str_replace('\\', '/', $namespace);
+        $path      = APP_ROOT . '/' . str_replace('\\', '/', $namespace);
 
         if( is_dir($path) === false ) {
             FileHelper::createDirectory($path);
@@ -35,7 +40,7 @@ class HelperController extends Controller
     {
         $namespace = $this->helperNamespace();
         $path      = $this->helperPath();
-        $className = 'BlockHelper';
+        $className = 'Block';
         $fileName  = "{$path}/{$className}.php";
 
         $idComments  = '';
@@ -52,34 +57,56 @@ SQL;
         foreach( $command->queryAll() as $row ) {
             $code = $row['CODE'];
             $type = $row['IBLOCK_TYPE_ID'];
+
+            if( preg_match('#[/\#\-\!\?\=]+#', $code . $type) ) {
+                continue;
+            }
+
             $idComments .= "\n * @property int   \$id__{$code}__from__{$type}";
             $getComments .= "\n * @property array \$get__{$code}__from__{$type}";
         }
 
-        $helper = <<<PHP
+        $internalBody = <<<BODY
+ *{$idComments}
+ *{$getComments}
+BODY;
+
+        $contents = <<<PHP
 <?php
 
 namespace {$namespace};
 
 /**
  * Class {$className}
- * @package core\helpers
- *{$idComments}
- *{$getComments}
+ * @package {$namespace}
+ *
+ * @internal {begin}
+{$internalBody}
+ * @internal {end}
  */
-class {$className} extends \\byiitrix\helpers\\{$className}
+class {$className} extends \\byiitrix\components\\{$className}
 {
 }
+
 PHP;
 
-        file_put_contents($fileName, $helper);
+        if( file_exists($fileName) ) {
+            $pattern          = $this->helperPattern();
+            $originalContents = file_get_contents($fileName);
+
+            if( preg_match($pattern, $originalContents) ) {
+                $contents = preg_replace($pattern, '$1' . PHP_EOL . $internalBody . PHP_EOL . '$2', $originalContents);
+            }
+        }
+
+        file_put_contents($fileName, $contents);
     }
 
     public function actionProperty()
     {
         $namespace = $this->helperNamespace();
         $path      = $this->helperPath();
-        $className = 'PropertyHelper';
+        $className = 'Property';
         $fileName  = "{$path}/{$className}.php";
 
         $idComments  = '';
@@ -88,6 +115,7 @@ PHP;
         $sql = <<<SQL
 SELECT 
     `b_iblock_property`.`CODE` AS `PROPERTY_CODE`, 
+    `b_iblock_property`.`PROPERTY_TYPE` AS `PROPERTY_TYPE`, 
     `b_iblock`.`CODE` AS `IBLOCK_CODE`, 
     `b_iblock`.`IBLOCK_TYPE_ID`
 FROM `b_iblock_property`
@@ -101,43 +129,67 @@ SQL;
             $property = $row['PROPERTY_CODE'];
             $block    = $row['IBLOCK_CODE'];
             $type     = $row['IBLOCK_TYPE_ID'];
+
+            if( preg_match('#[/\#\-\!\?\=]+#', $property . $block . $type) ) {
+                continue;
+            }
+
             $idComments .= "\n * @property int   \$id__{$property}__in__{$block}__from__{$type}";
             $getComments .= "\n * @property array \$get__{$property}__in__{$block}__from__{$type}";
         }
 
-        $helper = <<<PHP
+        $internalBody = <<<BODY
+ *{$idComments}
+ *{$getComments}
+BODY;
+
+        $contents = <<<PHP
 <?php
 
 namespace {$namespace};
 
 /**
  * Class {$className}
- * @package core\helpers
- *{$idComments}
- *{$getComments}
+ * @package {$namespace}
+ *
+ * @internal {begin}
+{$internalBody}
+ * @internal {end}
  */
-class {$className} extends \\byiitrix\helpers\\{$className}
+class {$className} extends \\byiitrix\components\\{$className}
 {
 }
+
 PHP;
 
-        file_put_contents($fileName, $helper);
+        if( file_exists($fileName) ) {
+            $pattern          = $this->helperPattern();
+            $originalContents = file_get_contents($fileName);
+
+            if( preg_match($pattern, $originalContents) ) {
+                $contents = preg_replace($pattern, '$1' . PHP_EOL . $internalBody . PHP_EOL . '$2', $originalContents);
+            }
+        }
+
+        file_put_contents($fileName, $contents);
     }
 
     public function actionPropertyEnum()
     {
         $namespace = $this->helperNamespace();
         $path      = $this->helperPath();
-        $className = 'PropertyEnumHelper';
+        $className = 'PropertyEnum';
         $fileName  = "{$path}/{$className}.php";
 
-        $idComments  = '';
-        $getComments = '';
+        $idComments     = '';
+        $getComments    = '';
+        $listOfComments = '';
 
         $sql = <<<SQL
 SELECT 
     `b_iblock_property_enum`.`XML_ID`,
     `b_iblock_property`.`CODE` AS `PROPERTY_CODE`, 
+    `b_iblock_property`.`PROPERTY_TYPE` AS `PROPERTY_TYPE`, 
     `b_iblock`.`CODE` AS `IBLOCK_CODE`, 
     `b_iblock`.`IBLOCK_TYPE_ID`
 FROM `b_iblock_property_enum`
@@ -154,26 +206,74 @@ SQL;
             $block    = $row['IBLOCK_CODE'];
             $type     = $row['IBLOCK_TYPE_ID'];
 
+            if( preg_match('#[/\#\-\!\?\=]+#', $xmlID . $property . $block . $type) ) {
+                continue;
+            }
+
             $idComments .= "\n * @property int   \$id__{$xmlID}__of__{$property}__in__{$block}__from__{$type}";
             $getComments .= "\n * @property array \$get__{$xmlID}__of__{$property}__in__{$block}__from__{$type}";
         }
 
-        $helper = <<<PHP
+        $sql = <<<SQL
+SELECT 
+    `b_iblock_property`.`CODE` AS `PROPERTY_CODE`, 
+    `b_iblock_property`.`PROPERTY_TYPE` AS `PROPERTY_TYPE`, 
+    `b_iblock`.`CODE` AS `IBLOCK_CODE`, 
+    `b_iblock`.`IBLOCK_TYPE_ID`
+FROM `b_iblock_property`
+INNER JOIN `b_iblock` ON `b_iblock`.`ID` = `b_iblock_property`.`IBLOCK_ID`
+WHERE `b_iblock_property`.`PROPERTY_TYPE` = 'L'
+ORDER BY `b_iblock`.`IBLOCK_TYPE_ID`, `b_iblock`.`CODE`, `b_iblock_property`.`CODE`;
+SQL;
+
+        $command = \Yii::$app->getDb()->createCommand($sql);
+
+        foreach( $command->queryAll() as $row ) {
+            $property = $row['PROPERTY_CODE'];
+            $block    = $row['IBLOCK_CODE'];
+            $type     = $row['IBLOCK_TYPE_ID'];
+
+            if( preg_match('#[/\#\-\!\?\=]+#', $property . $block . $type) ) {
+                continue;
+            }
+
+            $listOfComments .= "\n * @property array \$list_of__{$property}__in__{$block}__from__{$type}";
+        }
+
+        $internalBody = <<<BODY
+ *{$listOfComments}
+ *{$idComments}
+ *{$getComments}
+BODY;
+
+        $contents = <<<PHP
 <?php
 
 namespace {$namespace};
 
 /**
  * Class {$className}
- * @package core\helpers
- *{$idComments}
- *{$getComments}
+ * @package {$namespace}
+ *
+ * @internal {begin}
+{$internalBody}
+ * @internal {end}
  */
-class {$className} extends \\byiitrix\helpers\\{$className}
+class {$className} extends \\byiitrix\components\\{$className}
 {
 }
+
 PHP;
 
-        file_put_contents($fileName, $helper);
+        if( file_exists($fileName) ) {
+            $pattern          = $this->helperPattern();
+            $originalContents = file_get_contents($fileName);
+
+            if( preg_match($pattern, $originalContents) ) {
+                $contents = preg_replace($pattern, '$1' . PHP_EOL . $internalBody . PHP_EOL . '$2', $originalContents);
+            }
+        }
+
+        file_put_contents($fileName, $contents);
     }
 }

@@ -14,3 +14,14 @@ Yii::setAlias('byiitrix', APP_ROOT . '/vendor/ksaitechnologies/byiitrix');
 Yii::$classMap['yii\helpers\ArrayHelper']  = '@byiitrix/yii/helpers/ArrayHelper.php';
 Yii::$classMap['yii\helpers\StringHelper'] = '@byiitrix/yii/helpers/StringHelper.php';
 Yii::$classMap['yii\helpers\Console']      = '@byiitrix/yii/helpers/Console.php';
+
+if( class_exists(Kint::class) ) {
+    Kint::$enabled_mode = YII_ENV !== 'prod';
+
+    function kint()
+    {
+        $args = func_get_args();
+
+        return call_user_func_array([Kint::class, 'dump'], $args);
+    }
+}
